@@ -1,0 +1,216 @@
+#include <iostream>
+using namespace std;
+
+class WaterTank {   // 클래스 선언
+private:
+    int water;   // 물 양을 저장하는 변수 (외부 접근 금지 private)
+
+public:
+    WaterTank(int w) : water(w) {   // water(w)는 water 변수에 w 값을 바로 넣음, 생성자
+        cout << "물통 설치 (물: " << water << "ml)" << endl;   // 객체가 생성될 때 현재 물의 양을 출력
+    }
+
+    ~WaterTank() {   // 소멸자
+        cout << "물통 제거" << endl;   // 객체가 메모리에서 제거될 때 실행되는 코드
+    }
+
+    bool useWater(int amount) {  // 물을 사용하는 함수(amount 만큼 물을 쓸 수 있는지 확인함)
+        if (water >= amount) {   // 현재 물의 양이 사용하려는 양보다 많거나 같으면
+            water -= amount;   // 해당 양만큼 물을 감소시킴
+            return true;   // 사용 성공 -> true 반환
+        }
+        return false;   // 물이 부족하면 실패 -> false 반환
+    }
+
+    void addWater(int amount) {   // 물을 추가하는 함수
+        water += amount;   // 기존 물의 양에 amount 만큼 더함
+        cout << "물 추가 완료" << endl;   // 사용자에게 완료 메시지 출력
+    }
+
+    int getWater() {   // 현재 물의 양을 반환하는 함수
+        return water;   // water 값을 그대로 돌려줌
+    }
+};
+
+class CoffeeDispenser {  // 커피를 관리하는 클래스
+private:
+    int coffee;  // 현재 커피 양을 저장하는 변수 (외부 접근 차단 private)
+
+public:
+    CoffeeDispenser(int c) : coffee(c) {  // 생성자, coffee 변수에 c 값 바로 대입(초기화)
+        cout << "커피 디스펜서 설치 (커피: " << coffee << "g)" << endl;   // 객체 생성될 때 현재 커피 양 출력
+    }
+
+    ~CoffeeDispenser() {  // 소멸자
+        cout << "커피 디스펜서 제거" << endl;   // 프로그램 종료 또는 객체 삭제 시 실행됨
+    }
+
+    bool useCoffee(int amount) {  // 커피를 사용하는 함수 (amount 만큼 사용할 수 있는지)
+        if (coffee >= amount) {   // 현재 커피 양이 필요한 양보다 많거나 같으면
+            coffee -= amount;   // 그만큼 커피 감소
+            return true;  // 사용 성공 -> true 반환
+        }
+        return false;  // 커피 부족 실패 -> false 반환
+    }
+
+    void addCoffee(int amount) {   // 커피를 추가하는 함수
+        coffee += amount;  // 기존 커피에 amount만큼 더함
+        cout << "커피가루 추가 완료" << endl;  // 사용자에게 문구 출력
+    }
+
+    int getCoffee() {   // 현재 커피 양을 반환하는 함수
+        return coffee;   // coffee 값 그대로 반환
+    }
+};
+
+class CupDispenser {  // 컵을 관리하는 클래스
+private:
+    int cups;  // 현재 남아있는 컵 개수 (private)
+
+public:
+    CupDispenser(int c) : cups(c) {  // 생성자, cups에 c값 저장(초기화)
+        cout << "컵 디스펜서 설치 (컵: " << cups << "개)" << endl;  // 생성될 때 현재 컵 개수 출력
+    }
+
+    ~CupDispenser() {  // 소멸자
+        cout << "컵 디스펜서 제거" << endl;
+    }
+
+    bool useCup() {  // 컵 하나 사용하는 함수
+        if (cups > 0) {  // 컵이 하나라도 남아있으면
+            cups--;  // 컵 1개 감소
+            return true;  // 성공
+        }
+        return false;  // 컵 없음 -> 실패
+    }
+
+    void addCup(int amount) {  // 컵을 여러 개 추가하는 함수
+        cups += amount;  // 컵 개수에 amount 개 추가
+        cout << "컵 추가 완료" << endl;  // 사용자에게 문구 출력
+    }
+
+    int getCups() {  // 현재 컵 개수 반환 함수
+        return cups;  // cups 값 그대로 반환
+    }
+};
+
+class CoffeeMachine {  // 커피머신 전체를 담당하는 클래스
+private:
+    WaterTank waterTank;  // 물 관리
+    CoffeeDispenser coffeeDispenser;   // 커피 관리
+    CupDispenser cupDispenser;  // 컵 관리
+
+public:
+    CoffeeMachine()
+        : waterTank(1000), coffeeDispenser(100), cupDispenser(10) {
+        cout << "커피머신 설치 완료" << endl;
+    }  // 초기값: 물 1000ml, 커피 100g, 컵 10개
+
+    ~CoffeeMachine() {  // 소멸자
+        cout << "커피머신 종료" << endl;  // 객체 사라질 때 실행
+    }
+  
+    void makeCoffee() {  // 커피 만드는 함수
+        cout << "커피 제조 시작" << endl;
+        
+      // 컵이 있는지 확인
+        if (!cupDispenser.useCup()) {
+            cout << "컵이 부족합니다" << endl;
+            return;
+        }  // 컵이 있으면 1개 사용 후 true 반환, 컵이 없으면 false 반환
+
+        // 물이 있는지 확인 (150ml)
+        if (!waterTank.useWater(150)) {   // 물이 부족하면 false 반환 -> ! 때문에 if 실행
+            cout << "물이 부족합니다" << endl;
+            return;  // 종료
+        }
+
+         // 커피가 충분한지 확인 (10g)
+        if (!coffeeDispenser.useCoffee(10)) {  // 커피 부족 시 false 반환 -> !로 인해 if 실행
+            cout << "커피가 부족합니다" << endl;
+            return;  // 종료
+        }
+
+        cout << "커피가 완성되었습니다" << endl;  // 모든 조건을 통과했을 때
+    }
+
+    void showStatus() {  // 커피머신 내부 상태 출력하는 함수
+        cout << "현재 상태" << endl;
+        cout << "물: " << waterTank.getWater() << "ml" << endl;
+        // WaterTank 객체에서 물의 양 가져옴, getWater 현재 물의 양 반환
+        cout << "커피: " << coffeeDispenser.getCoffee() << "g" << endl;
+        // CoffeeDispenser 객체에서 저장된 커피 양 가져옴, getCoffee 현재 커피 양 반환
+        cout << "컵: " << cupDispenser.getCups() << "개" << endl;
+        // CupDispenser 객체에서 저장된 컵 개수 가져옴, getCups 현재 컵 개수 반환
+    }
+
+    void fillWater(int amount) {  // 물을 추가하는 함수
+    // waterTank 객체의 addWater 함수 호출
+        waterTank.addWater(amount);
+    }
+
+    void fillCoffee(int amount) {  // 커피를 추가하는 함수
+    // coffeeDispenser 객체의 addCoffee 함수 호출
+        coffeeDispenser.addCoffee(amount);
+    }
+
+    void fillCup(int amount) {  // 컵을 추가하는 함수
+    // cupDispenser 객체의 addCup 함수 호출
+        cupDispenser.addCup(amount);
+    }
+};
+
+int main() {  // 프로그램 시작
+    CoffeeMachine machine;  // CoffeeMachine 객체 생성, 생성자 호출 + 내부 객체 생성
+
+    int choice;  // 사용자에게 받은 입력 저장할 변수
+
+    while (true) {  // 무한 반복 (사용자가 종료할 때까지)
+        cout << endl;
+        cout << "====== 커피머신 메뉴 ======" << endl;
+        cout << "1. 커피 만들기" << endl;
+        cout << "2. 상태 확인" << endl;
+        cout << "3. 물 채우기" << endl;
+        cout << "4. 커피 채우기" << endl;
+        cout << "5. 컵 채우기" << endl;
+        cout << "0. 종료" << endl;
+        cout << "선택: ";
+
+        cin >> choice;  // 입력을 받아 choice 변수에 저장
+
+        if (choice == 0) {  // 0 입력 시
+            cout << "프로그램 종료" << endl;  // 종료
+            break;  // while 반복문 탈출
+        }
+
+        int amount;  // 물, 커피, 컵을 추가할 때 사용할 변수
+
+        switch (choice) {  // 입력받은 번호에 따라 실행할 기능 선택
+        case 1:  // 1번: 커피 만들기
+            machine.makeCoffee(); // makeCoffee 함수 호출
+            break;
+        case 2:  // 2번: 현재 상태 확인
+            machine.showStatus();  // 물, 커피, 컵 상태 출력
+            break;
+        case 3:  // 3번: 물 채우기
+            cout << "추가할 물 양 입력: ";  // 사용자에게 물 양 입력 받음
+            cin >> amount;  // 입력값을 amount 변수에 저장
+            machine.fillWater(amount);  // WaterTank에 물 추가
+            break;
+        case 4:  // 4번: 커피 채우기
+            cout << "추가할 커피 양 입력: ";  // 입력 받음
+            cin >> amount;
+            machine.fillCoffee(amount);  // CoffeeDispenser에 커피 추가
+            break;
+        case 5:  // 5번: 컵 채우기
+            cout << "추가할 컵 개수 입력: ";  // 입력받음
+            cin >> amount;
+            machine.fillCup(amount);  // CupDispenser에 컵 추가
+            break;
+        default: // 1~5, 0 이외의 값 입력 받으면
+            cout << "잘못된 입력입니다" << endl;  // 오류 메시지 출력
+        }
+    }
+
+    return 0;
+}
