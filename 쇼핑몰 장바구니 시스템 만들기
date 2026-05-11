@@ -1,0 +1,192 @@
+#include <iostream>
+#include <vector> 
+#include <string>
+using namespace std;
+
+// 상품 정보를 저장하기 위한 클래스
+class Product {
+public:
+    string name;   // 상품 이름
+    int price;     // 상품 가격
+    int count;     // 상품 수량
+
+    // 생성자: 상품을 만들 때 이름, 가격, 수량을 저장
+    Product(string n, int p, int c) {
+        name = n;     // 입력받은 상품 이름 저장
+        price = p;    // 입력받은 상품 가격 저장
+        count = c;    // 입력받은 상품 수량 저장
+    }
+
+    // 상품 하나의 총 금액을 계산하는 함수
+    int getTotalPrice() {
+        return price * count;  // 가격 * 수량 반환
+    }
+
+    // 상품 정보를 출력하는 함수
+    void showProduct() {
+        cout << "- " << name << "[" << count << "개] : "
+             << getTotalPrice() << "원"
+             << " (단가: " << price << "원)" << endl;
+    }
+};
+
+int main() {
+    vector<Product*> cart;       // 장바구니를 저장할 vector, Product 객체의 주소를 저장
+    vector<Product*> paidList;   // 결제 완료된 상품들을 저장할 vector
+
+    int menu;  // 사용자가 선택할 메뉴 번호
+
+    while (true) {  // 프로그램 종료 전까지 계속 반복
+        cout << endl;
+        cout << "======= 쇼핑몰 장바구니 시스템 =======" << endl;
+        cout << "1. 장바구니 담기" << endl;
+        cout << "2. 장바구니 목록 보기" << endl;
+        cout << "3. 결제하기" << endl;
+        cout << "4. 전체 결제 내역 확인" << endl;
+        cout << "5. 프로그램 종료" << endl;
+        cout << ">> 메뉴 선택 : ";
+        cin >> menu;  // 메뉴 번호 입력받기
+
+        // 1번 메뉴: 장바구니 담기
+        if (menu == 1) {
+            string name;  // 상품 이름을 저장할 변수
+            int price;    // 상품 가격을 저장할 변수
+            int count;    // 상품 수량을 저장할 변수
+
+            cout << endl;
+            cout << "[장바구니 담기]" << endl;
+
+            cout << "상품 이름 : ";
+            cin >> name;  // 상품 이름 입력
+
+            cout << "가격 : ";
+            cin >> price;  // 상품 가격 입력
+
+            cout << "수량 : ";
+            cin >> count;  // 상품 수량 입력
+
+            // new를 사용하여 Product 객체를 동적으로 생성
+            Product* p = new Product(name, price, count);
+
+            // 생성한 상품 객체의 주소를 장바구니 vector에 추가
+            cart.push_back(p);
+
+            cout << "상품 추가 완료했습니다." << endl;
+        }
+
+        // 2번 메뉴: 장바구니 목록 보기
+        else if (menu == 2) {
+            cout << endl;
+            cout << "------- [장바구니 목록] -------" << endl;
+
+            // 장바구니가 비어 있는 경우
+            if (cart.empty()) {
+                cout << "(장바구니에 담긴 상품이 없습니다.)" << endl;
+            }
+            // 장바구니에 상품이 있는 경우
+            else {
+                // 장바구니에 들어 있는 상품들을 하나씩 출력
+                for (int i = 0; i < cart.size(); i++) {
+                    cart[i]->showProduct();  // 포인터이므로 -> 사용
+                }
+            }
+
+            cout << "------------------------------" << endl;
+        }
+
+        // 3번 메뉴: 결제하기
+        else if (menu == 3) {
+            cout << endl;
+
+            // 장바구니가 비어 있으면 결제할 수 없음
+            if (cart.empty()) {
+                cout << "장바구니에 담긴 상품이 없습니다." << endl;
+            }
+            // 장바구니에 상품이 있으면 결제 진행
+            else {
+                int total = 0;  // 최종 결제 금액을 저장할 변수
+                char answer;    // 결제 여부를 입력받을 변수
+
+                cout << "------- [결제 상세 내역] -------" << endl;
+
+                // 장바구니 상품들을 출력하고 총 금액 계산
+                for (int i = 0; i < cart.size(); i++) {
+                    cart[i]->showProduct();                  // 상품 정보 출력
+                    total = total + cart[i]->getTotalPrice(); // 총 금액에 상품 금액 더하기
+                }
+
+                cout << "--------------------------------" << endl;
+                cout << "최종 결제 금액 : " << total << "원" << endl;
+
+                cout << "결제하시겠습니까? (Y/N) : ";
+                cin >> answer;  // Y 또는 N 입력받기
+
+                // Y 또는 y를 입력한 경우 결제 완료
+                if (answer == 'Y' || answer == 'y') {
+                    // 장바구니에 있던 상품들을 결제 내역으로 옮기기
+                    for (int i = 0; i < cart.size(); i++) {
+                        paidList.push_back(cart[i]);
+                    }
+
+                    // 장바구니는 비우기
+                    cart.clear();
+
+                    cout << "결제가 완료되었습니다. 장바구니를 비웁니다." << endl;
+                }
+                // N 또는 n을 입력한 경우 결제 취소
+                else if (answer == 'N' || answer == 'n') {
+                    cout << "결제가 취소되었습니다." << endl;
+                }
+                // Y/N 외 다른 문자를 입력한 경우
+                else {
+                    cout << "잘못 입력했습니다. 결제가 취소됩니다." << endl;
+                }
+            }
+        }
+
+        // 4번 메뉴: 전체 결제 내역 확인
+        else if (menu == 4) {
+            cout << endl;
+            cout << "------- [주문 상세 내역] -------" << endl;
+
+            // 결제 내역이 없는 경우
+            if (paidList.empty()) {
+                cout << "(결제내역이 없습니다.)" << endl;
+            }
+            // 결제 내역이 있는 경우
+            else {
+                // 결제된 상품들을 하나씩 출력
+                for (int i = 0; i < paidList.size(); i++) {
+                    paidList[i]->showProduct();
+                }
+            }
+
+            cout << "------------------------------" << endl;
+        }
+
+        // 5번 메뉴: 프로그램 종료
+        else if (menu == 5) {
+            cout << endl;
+            cout << "프로그램을 종료합니다." << endl;
+
+            // 아직 장바구니에 남아 있는 상품 메모리 반환
+            for (int i = 0; i < cart.size(); i++) {
+                delete cart[i];  // new로 만든 객체 삭제
+            }
+
+            // 결제 내역에 있는 상품 메모리 반환
+            for (int i = 0; i < paidList.size(); i++) {
+                delete paidList[i];  // new로 만든 객체 삭제
+            }
+
+            break;  // while문 종료
+        }
+
+        // 1~5가 아닌 번호를 입력한 경우
+        else {
+            cout << "잘못된 번호입니다. 1~5 사이만 입력해주세요." << endl;
+        }
+    }
+
+    return 0;
+}
