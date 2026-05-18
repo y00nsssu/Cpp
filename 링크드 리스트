@@ -1,0 +1,94 @@
+#include <iostream>
+#include <string>
+using namespace std;
+
+// 노드 클래스
+// 링크드 리스트에서 데이터 하나를 저장하는 칸 역할
+template <typename T> // T는 나중에 string, int 등으로 바뀔 수 있는 임시 자료형
+class Node {
+public:
+    T data;           // 실제로 저장할 데이터
+    Node<T>* next;    // 다음 노드를 가리키는 포인터
+
+    // 노드 생성자
+    Node(T value) {   // value는 새 노드에 저장할 값
+        data = value; // 전달받은 값을 data에 저장
+        next = NULL;  // 처음에는 다음 노드가 없으므로 NULL로 설정
+    }
+};
+
+// 링크드 리스트 클래스
+// 여러 개의 노드를 연결해서 목록처럼 관리하는 클래스
+template <typename T> // 이 리스트도 다양한 자료형을 저장할 수 있게 템플릿 사용
+class TodoList {
+private:
+    Node<T>* head;    // 리스트의 첫 번째 노드를 가리키는 포인터
+
+public:
+    // 생성자
+    TodoList() {
+        head = NULL;  // 처음 리스트는 비어 있으므로 첫 노드는 없음
+    }
+
+    // 할 일 추가 함수
+    void add(T value) {                     // value는 추가할 할 일 내용
+        Node<T>* newNode = new Node<T>(value); // 새 노드를 동적으로 생성
+
+        if (head == NULL) {                 // 리스트가 비어 있다면
+            head = newNode;                 // 새 노드를 첫 번째 노드로 설정
+        }
+        else {                            // 이미 노드가 하나 이상 있다면
+            Node<T>* temp = head;           // temp를 첫 번째 노드부터 시작하게 함
+
+            while (temp->next != NULL) {    // 다음 노드가 있는 동안 반복
+                temp = temp->next;          // temp를 다음 노드로 이동
+            }
+
+            temp->next = newNode;           // 마지막 노드 뒤에 새 노드를 연결
+        }
+    }
+
+    // 목록 출력 함수
+    void show() {
+        Node<T>* temp = head;               // 첫 번째 노드부터 출력 시작
+        int count = 1;                      // 출력 번호를 1번부터 시작
+
+        cout << "[오늘의 할 일 목록]" << endl; // 제목 출력
+
+        while (temp != NULL) {              // temp가 NULL이 아닐 때까지 반복
+            cout << count << ". " << temp->data << endl; // 번호와 데이터 출력
+            temp = temp->next;              // 다음 노드로 이동
+            count++;                        // 번호 1 증가
+        }
+    }
+
+    // 소멸자
+    // 프로그램이 끝날 때 동적으로 만든 노드들을 삭제
+    ~TodoList() {
+        Node<T>* temp = head;               // 첫 번째 노드부터 삭제 시작
+
+        while (temp != NULL) {              // 삭제할 노드가 남아 있는 동안 반복
+            Node<T>* deleteNode = temp;     // 현재 노드를 삭제할 대상으로 저장
+            temp = temp->next;              // temp를 다음 노드로 먼저 이동
+            delete deleteNode;              // 이전 노드를 메모리에서 삭제
+        }
+    }
+};
+
+int main() {
+    // string 자료형을 저장하는 TodoList 객체를 동적으로 생성
+    TodoList<string>* myList = new TodoList<string>;
+
+    // 할 일 목록에 문자열 데이터 추가
+    myList->add("C++ 스터디 복습하기");
+    myList->add("링크드 리스트 과제하기");
+    myList->add("블로그에 정리글 올리기");
+
+    // 저장된 할 일 목록 출력
+    myList->show();
+
+    // 동적으로 생성한 TodoList 객체 삭제
+    delete myList;
+
+    return 0;
+}
